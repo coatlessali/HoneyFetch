@@ -111,5 +111,6 @@ export_button.text_color = warn
 print(cpu)
 if os.path.exists('vulkaninfo.txt'):
     os.remove('vulkaninfo.txt')
-    
-app.display()
+
+if __name__ == "__main__":
+    app.display()
