@@ -17,7 +17,8 @@ bad = "#b43421"
 
 # Subprocess to get vulkaninfo output.
 try:
-    vulkaninfostr = subprocess.check_output(["vulkaninfo", "--summary"], shell=False, text=True)
+    vulkaninfostrchk = subprocess.check_output(["vulkaninfo", "--summary"], shell=False, text=True)
+    vulkaninfostr = str(vulkaninfostrchk)
 except:
     vulkaninfostr = "yikes"
 finally:
