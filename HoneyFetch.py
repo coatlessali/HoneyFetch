@@ -79,7 +79,7 @@ deviceName_color = color_parse_str(driverName, "llvmpipe", bad, normal)
 # GUI
 app = App(title="HoneyFetch", bg=bg)
 
-funny = Picture(app, image="gato.webp", align="right")
+funny = Picture(app, image="gato.png", align="right")
 
 cput = Text(app, text=f"CPU: {cpu}")
 cput.text_color = normal
