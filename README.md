@@ -5,3 +5,5 @@ A system diagnostics tool for use with the Sonic the Fighters system survey. Par
 Download the latest release, and open the included executable.
 
 Todo: Write the rest of this when it's not 2:28 AM.
+
+**RUNNING THE PYINSTALLER GENERATED PACKAGE ON WINDOWS CAUSES A FORK BOMB**
