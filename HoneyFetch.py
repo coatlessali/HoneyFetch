@@ -40,15 +40,21 @@ if __name__ == '__main__':
 
     # Parse color.
     def color_parse_str(field, cont, color, color2):
-        if cont in field:
-            return color
-        else:
+        try:
+            if cont in field:
+                return color
+            else:
+                return color2
+        except:
             return color2
 
     def color_parse_bool(field, color, color2):
-        if field:
-            return color
-        else:
+        try:
+            if field:
+                return color
+            else:
+                return color2
+        except:
             return color2
 
     # Export.
