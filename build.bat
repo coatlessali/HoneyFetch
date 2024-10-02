@@ -1,2 +1,2 @@
-pyinstaller HoneyFetch.py --hidden-import='PIL._tkinter_finder'
-copy gato.png dist/HoneyFetch/gato.png
+pyinstaller HoneyFetch.py --hidden-import='PIL._tkinter_finder' --onefile
+copy gato.png dist\HoneyFetch\

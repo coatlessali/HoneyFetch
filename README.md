@@ -4,6 +4,9 @@ A system diagnostics tool for use with the Sonic the Fighters system survey. Par
 ### Usage
 Download the latest release, and open the included executable.
 
-Todo: Write the rest of this when it's not 2:28 AM.
+Click "Export" to create a log.
 
-**RUNNING THE PYINSTALLER GENERATED PACKAGE ON WINDOWS CAUSES A FORK BOMB**
+### Building
+Use `pip` to install `py-cpuinfo`, `guizero`, and `pyinstaller`.
+
+Run `build.bat` on Windows, or `build.sh` on MacOS/Linux.
