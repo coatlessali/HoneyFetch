@@ -1,10 +1,6 @@
 if __name__ == '__main__':
     from guizero import App, PushButton, Text, Picture, ButtonGroup
-    import platform
-    import subprocess
-    import cpuinfo
-    import os
-    import multiprocessing
+    import platform, subprocess, cpuinfo, os, multiprocessing, sys, cffi
     from cpuinfo import get_cpu_info
 
     multiprocessing.freeze_support()
@@ -19,24 +15,72 @@ if __name__ == '__main__':
 
     # cpu info stuff.
 
-    # Subprocess to get vulkaninfo output.
-    try:
-        vulkaninfostrchk = subprocess.check_output(["vulkaninfo", "--summary"], shell=False, text=True)
-        vulkaninfostr = str(vulkaninfostrchk)
-    except:
-        vulkaninfostr = "yikes"
-    finally:
-        with open("vulkaninfo.txt", "w+") as vulkaninfotxt:
-            vulkaninfotxt.write(vulkaninfostr)
+    ffi = cffi.FFI()
+            
+    # This part was written by gloria.
+    # I didn't ask for this, she just wrote it,
+    # and said it was now mine apparently.
+    def testVulkan() -> str:
+        try:
+            import vulkan as vk
+        except OSError:
+            return "Vulkan runtime could not be found."
 
-    # Parse vulkaninfo.
-    def vk_parse(vkstring):
-        with open('vulkaninfo.txt', 'rt') as f:
-            vulkaninfo = f.readlines()
-        for line in vulkaninfo:
-            if vkstring in line:
-                finalvkstring = line.split("= ",1)[1]
-                return finalvkstring
+        appInfo = vk.VkApplicationInfo(
+            pApplicationName="HoneyFetch",
+            applicationVersion=1,
+            apiVersion=vk.VK_MAKE_VERSION(1, 1, 0)
+        )
+
+        flags = None
+        extensions: [str] = [ ]
+
+        if sys.platform == "darwin":
+            flags.vk.VK_INSTANCE_CREATE_ENUMERATE_PORTABILITY_BIT_KHR
+            extensions.append(vk.VK_KHR_PORTABILITY_ENUMERATION_EXTENSION_NAME)
+        instanceInfo = vk.VkInstanceCreateInfo(
+            flags=flags,
+            pApplicationInfo=appInfo,
+            enabledExtensionCount=len(extensions),
+            ppEnabledExtensionNames=extensions
+        )
+
+        try:
+            instance: vk.VkInstance = vk.vkCreateInstance(instanceInfo, None)
+        except vk.VkErrorIncompatibleDriver:
+            return "No compatible vulkan driver was found."
+
+        try:
+            devices: [vk.VkPhysicalDevice] = vk.vkEnumeratePhysicalDevices(instance=instance)
+        except:
+            return "Could not discover Vulkan devices."
+            
+        if len(devices) == 0:
+            return "No Vulkan 1.1 compatible device found."
+            
+        goodDriverProperties: vk.VkPhysicalDeviceDriverProperties = None
+        goodDevProperties: vk.VkPhysicalDeviceProperties = None
+            
+        for device in devices:
+            driverProperties = vk.VkPhysicalDeviceDriverProperties()
+            deviceProperties = vk.VkPhysicalDeviceProperties2(pNext=driverProperties)
+            
+            vk.vkGetPhysicalDeviceProperties2(device, deviceProperties)
+            
+            if "llvmpipe" in driverProperties.driverName:
+                continue
+            
+            goodDriverProperties = driverProperties
+            goodDevProperties = deviceProperties
+            break
+            
+        if goodDriverProperties is None or goodDevProperties is None:
+            return "Failed to find a usable device."
+            
+        return [f"{ffi.string(goodDevProperties.properties.deviceName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverInfo).decode("utf-8")}", f"v{goodDevProperties.properties.driverVersion}", f"v{goodDevProperties.properties.apiVersion}"]
+
+
+    print(testVulkan())            
 
     # Parse color.
     def color_parse_str(field, cont, color, color2):
@@ -73,11 +117,11 @@ if __name__ == '__main__':
     avx2 = "avx2" in get_cpu_info()["flags"]
     arch = platform.machine()
     system = platform.system()
-    deviceName = vk_parse("deviceName")
-    apiVersion = vk_parse("apiVersion")
-    driverVersion = vk_parse("driverVersion")
-    driverName = vk_parse("driverName")
-    driverInfo = vk_parse("driverInfo")
+    deviceName = testVulkan()[0]
+    apiVersion = "placeholder"
+    driverVersion = testVulkan()[3]
+    driverName = testVulkan()[1]
+    driverInfo = testVulkan()[2]
 
     # COLOR DEFS
     cpu_color = normal
