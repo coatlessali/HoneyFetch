@@ -7,6 +7,6 @@ Download the latest release, and open the included executable.
 Click "Export" to create a log.
 
 ### Building
-Use `pip` to install `py-cpuinfo`, `guizero`, and `pyinstaller`.
+Use `pip` to install `py-cpuinfo`, `guizero`, `cffi`, `vulkan`, and `pyinstaller`.
 
 Run `build.bat` on Windows, or `build.sh` on MacOS/Linux.
