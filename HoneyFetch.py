@@ -49,15 +49,15 @@ if __name__ == '__main__':
         try:
             instance: vk.VkInstance = vk.vkCreateInstance(instanceInfo, None)
         except vk.VkErrorIncompatibleDriver:
-            return ["No compatible vulkan driver was found.", "None", "None"]
+            return ["No compatible vulkan driver was found.", "None", "None", bad]
 
         try:
             devices: [vk.VkPhysicalDevice] = vk.vkEnumeratePhysicalDevices(instance=instance)
         except:
-            return ["Could not discover Vulkan devices.", "None", "None"]
+            return ["Could not discover Vulkan devices.", "None", "None", bad]
             
         if len(devices) == 0:
-            return ["No Vulkan 1.1 compatible device found.", "None", "None"]
+            return ["No Vulkan 1.1 compatible device found.", "None", "None", bad]
             
         goodDriverProperties: vk.VkPhysicalDeviceDriverProperties = None
         goodDevProperties: vk.VkPhysicalDeviceProperties = None
@@ -76,9 +76,9 @@ if __name__ == '__main__':
             break
             
         if goodDriverProperties is None or goodDevProperties is None:
-            return "Failed to find a usable device."
+            return ["Failed to find a usable device.", "None", "None", bad]
             
-        return [f"{ffi.string(goodDevProperties.properties.deviceName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverInfo).decode("utf-8")}"]
+        return [f"{ffi.string(goodDevProperties.properties.deviceName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverInfo).decode("utf-8")}", good]
 
 
     print(testVulkan())            
@@ -127,7 +127,6 @@ if __name__ == '__main__':
     avx_color = color_parse_bool(avx, good, bad)
     avx2_color = color_parse_bool(avx2, good, bad)
     arch_color = color_parse_str(arch, "64", good, bad)
-    deviceName_color = color_parse_str(driverName, "llvmpipe", bad, normal) 
 
     # GUI
     app = App(title="HoneyFetch", bg=bg, width=960, height=720)
@@ -145,11 +144,11 @@ if __name__ == '__main__':
     systemt = Text(app, text=f"OS Type: {system}")
     systemt.text_color = normal
     deviceNamet = Text(app, text=f"GPU: {deviceName}")
-    deviceNamet.text_color = deviceName_color
+    deviceNamet.text_color = testVulkan()[3]
     driverNamet = Text(app, text=f"Driver in Use: {driverName}")
-    driverNamet.text_color = normal
+    driverNamet.text_color = testVulkan()[3]
     driverInfot = Text(app, text=f"Driver info: {driverInfo}")
-    driverInfot.text_color = normal
+    driverInfot.text_color = testVulkan()[3]
 
     stf_button = ButtonGroup(app, options=["STF runs perfect!", "STF stutters sometimes.", "STF runs poorly.", "STF crashes."])
     stf_button.text_color = normal
