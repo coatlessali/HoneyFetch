@@ -2,7 +2,7 @@
 # Do not touch this. Put everything in the if statement.
 if __name__ == '__main__':
     from guizero import App, PushButton, Text, Picture, ButtonGroup
-    import platform, subprocess, cpuinfo, os, multiprocessing, sys, cffi
+    import platform, subprocess, cpuinfo, os, multiprocessing, sys, cffi, json
     from cpuinfo import get_cpu_info
 
     # This also prevents the fork bomb, and is the reason we need to import multiprocessing.
@@ -142,12 +142,20 @@ if __name__ == '__main__':
     def export_info():
         if stf_button.value == None:
             app.error("Error!", "Please select a value.")
-        x = "\n"
-        #info = "CPU: " + cpu + x + "AVX: " + str(avx) + x + "AXV2: " + str(avx2) + x + str(arch._text) + x + "OS Type: " + system + x + "GPU: " + deviceName + x + "VK VERSION: " + apiVersion + x + "DRIVER VERSION: " + driverVersion + x + "DRIVER NAME: " + driverName + x + "DRIVER INFO:" + driverInfo + x + "STATUS:" + stf_button.value
-        info = f"CPU: {cpu_stats}, GPU: {vulkan_stats}"
-        with open('HoneyFetchEXPORT.txt', 'w+') as f:
-            f.write(info)
-        app.info("Notice", "Exported to HoneyFetchEXPORT.txt! Please send this in #troubleshooting, or to coatlessali for the survey!")
+        #info = f"CPU: {cpu_stats}, GPU: {vulkan_stats}"
+        info = {'cpu': cpu_stats[8],
+                'bits': cpu_stats[2],
+                'avx': cpu_stats[4],
+                'arch': cpu_stats[0],
+                'cpuwarnings': ', '.join(cpu_stats[6]),
+                'system': platform.system(),
+                'gpu': vulkan_stats[0],
+                'drivername': vulkan_stats[1],
+                'driverinfo': vulkan_stats[2]}
+        with open('HoneyExport.json', 'w+') as f:
+            #f.write(info)
+            json.dump(info, f, indent = 4, ensure_ascii = False)
+        app.info("Notice", "Exported to HoneyExport.json! Please send this in #troubleshooting, or to coatlessali for the survey!")
 
     # System info.
     cpu_stats = testProcessor()
@@ -158,12 +166,12 @@ if __name__ == '__main__':
 
     funny = Picture(app, image="gato.png", align="right")
 
-    cput = Text(app, text=f"CPU: {cpu_stats[8]}")
-    cput.text_color = normal
-    bitst = Text(app, text=f"{cpu_stats[2]}-bit")
-    bitst.text_color = cpu_stats[3]
-    avxt = Text(app, text=f"{cpu_stats[4]}")
-    avxt.text_color = cpu_stats[5]
+    cpu = Text(app, text=f"CPU: {cpu_stats[8]}")
+    cpu.text_color = normal
+    bits = Text(app, text=f"{cpu_stats[2]}-bit")
+    bits.text_color = cpu_stats[3]
+    avx = Text(app, text=f"{cpu_stats[4]}")
+    avx.text_color = cpu_stats[5]
     arch = Text(app, text=f"Architecture: {cpu_stats[0]}")
     arch.text_color = cpu_stats[1]
     cpuwarnings = Text(app, text=f"CPU Warnings: {', '.join(cpu_stats[6])}")
@@ -172,10 +180,10 @@ if __name__ == '__main__':
     system.text_color = normal
     deviceName = Text(app, text=f"GPU: {vulkan_stats[0]}")
     deviceName.text_color = testVulkan()[3]
-    driverNamet = Text(app, text=f"Driver in Use: {vulkan_stats[1]}")
-    driverNamet.text_color = testVulkan()[3]
-    driverInfot = Text(app, text=f"Driver info: {vulkan_stats[2]}")
-    driverInfot.text_color = testVulkan()[3]
+    driverName = Text(app, text=f"Driver in Use: {vulkan_stats[1]}")
+    driverName.text_color = testVulkan()[3]
+    driverInfo = Text(app, text=f"Driver info: {vulkan_stats[2]}")
+    driverInfo.text_color = testVulkan()[3]
 
     stf_button = ButtonGroup(app, options=["STF runs perfect!", "STF stutters sometimes.", "STF runs poorly.", "STF crashes."])
     stf_button.text_color = normal
