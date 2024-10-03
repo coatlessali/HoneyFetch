@@ -162,7 +162,7 @@ if __name__ == '__main__':
     vulkan_stats = testVulkan()
 
     # GUI
-    app = App(title="HoneyFetch", bg=bg, width=960, height=720)
+    app = App(title="HoneyFetch", bg=bg, width=708, height=411)
 
     funny = Picture(app, image="gato.png", align="right")
 
