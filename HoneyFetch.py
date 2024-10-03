@@ -12,19 +12,20 @@ if __name__ == '__main__':
     warn = "#24b7d6"
     good = "#12c615"
     bad = "#b43421"
-
-    # cpu info stuff.
-
-    ffi = cffi.FFI()
             
-    # This part was written by gloria.
+    # This part was written by @yeah-its-gloria.
     # I didn't ask for this, she just wrote it,
     # and said it was now mine apparently.
+    # I have made minimal edits to it.
+    # Please don't ask me how it works, I genuinely
+    # have no idea.
+    ffi = cffi.FFI()
+
     def testVulkan() -> str:
         try:
             import vulkan as vk
         except OSError:
-            return "Vulkan runtime could not be found."
+            return ["Vulkan runtime could not be found.", "None", "None"]
 
         appInfo = vk.VkApplicationInfo(
             pApplicationName="HoneyFetch",
@@ -48,15 +49,15 @@ if __name__ == '__main__':
         try:
             instance: vk.VkInstance = vk.vkCreateInstance(instanceInfo, None)
         except vk.VkErrorIncompatibleDriver:
-            return "No compatible vulkan driver was found."
+            return ["No compatible vulkan driver was found.", "None", "None"]
 
         try:
             devices: [vk.VkPhysicalDevice] = vk.vkEnumeratePhysicalDevices(instance=instance)
         except:
-            return "Could not discover Vulkan devices."
+            return ["Could not discover Vulkan devices.", "None", "None"]
             
         if len(devices) == 0:
-            return "No Vulkan 1.1 compatible device found."
+            return ["No Vulkan 1.1 compatible device found.", "None", "None"]
             
         goodDriverProperties: vk.VkPhysicalDeviceDriverProperties = None
         goodDevProperties: vk.VkPhysicalDeviceProperties = None
@@ -77,7 +78,7 @@ if __name__ == '__main__':
         if goodDriverProperties is None or goodDevProperties is None:
             return "Failed to find a usable device."
             
-        return [f"{ffi.string(goodDevProperties.properties.deviceName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverInfo).decode("utf-8")}", f"v{goodDevProperties.properties.driverVersion}", f"v{goodDevProperties.properties.apiVersion}"]
+        return [f"{ffi.string(goodDevProperties.properties.deviceName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverName).decode("utf-8")}", f"{ffi.string(goodDriverProperties.driverInfo).decode("utf-8")}"]
 
 
     print(testVulkan())            
@@ -118,8 +119,6 @@ if __name__ == '__main__':
     arch = platform.machine()
     system = platform.system()
     deviceName = testVulkan()[0]
-    apiVersion = "placeholder"
-    driverVersion = testVulkan()[3]
     driverName = testVulkan()[1]
     driverInfo = testVulkan()[2]
 
@@ -147,10 +146,6 @@ if __name__ == '__main__':
     systemt.text_color = normal
     deviceNamet = Text(app, text=f"GPU: {deviceName}")
     deviceNamet.text_color = deviceName_color
-    apiVersiont = Text(app, text=f"Vulkan API: {apiVersion}")
-    apiVersiont.text_color = normal
-    driverVersiont = Text(app, text=f"Driver Version: {driverVersion}")
-    driverVersiont.text_color = normal
     driverNamet = Text(app, text=f"Driver in Use: {driverName}")
     driverNamet.text_color = normal
     driverInfot = Text(app, text=f"Driver info: {driverInfo}")
