@@ -151,7 +151,8 @@ if __name__ == '__main__':
                 'system': platform.system(),
                 'gpu': vulkan_stats[0],
                 'drivername': vulkan_stats[1],
-                'driverinfo': vulkan_stats[2]}
+                'driverinfo': vulkan_stats[2],
+                'rating': stf_button.value}
         with open('HoneyExport.json', 'w+') as f:
             #f.write(info)
             json.dump(info, f, indent = 4, ensure_ascii = False)
